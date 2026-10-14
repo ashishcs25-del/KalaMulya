@@ -1,0 +1,41 @@
+[
+  {
+    "id": "kasuti",
+    "name": "Kasuti Embroidery",
+    "region": "Dharwad & Hubli, Karnataka",
+    "giTagged": true,
+    "description": "Exquisite geometric thread embroidery worked without knots, dating back to the Chalukya period.",
+    "productTypes": ["Dupatta", "Saree", "Wall Hanging", "Clutch Bag", "Kurta Yoke", "Cushion Cover"],
+    "commonMaterials": [
+      { "name": "Pure Handloom Cotton Fabric (meters)", "defaultPrice": 350 },
+      { "name": "Silk Embroidery Floss (skeins)", "defaultPrice": 45 },
+      { "name": "Needles & Tracing Grid", "defaultPrice": 80 }
+    ]
+  },
+  {
+    "id": "beedu",
+    "name": "Beedu Craft",
+    "region": "Dakshina Kannada & Udupi, Karnataka",
+    "giTagged": false,
+    "description": "Indigenous coastal weaving craft using seasoned reed fibers, river grasses, and eco-friendly dyes.",
+    "productTypes": ["Storage Basket", "Table Runner", "Hand Fan", "Decorative Mat", "Planter"],
+    "commonMaterials": [
+      { "name": "Wild River Grass / Reeds (bundle)", "defaultPrice": 180 },
+      { "name": "Organic Turmeric & Bark Dyes", "defaultPrice": 90 },
+      { "name": "Binding Thread & Jute Twine", "defaultPrice": 50 }
+    ]
+  },
+  {
+    "id": "kinhal",
+    "name": "Kinhal Woodcraft",
+    "region": "Koppal, Karnataka",
+    "giTagged": true,
+    "description": "Intricately carved lightweight softwood figurines and toys coated with chalk and tamarind seed paste.",
+    "productTypes": ["Idol / Figurine", "Wall Relief", "Traditional Tray", "Toy"],
+    "commonMaterials": [
+      { "name": "Seasoned Ponki Wood Block", "defaultPrice": 400 },
+      { "name": "Tamarind Seed Binder & Enamel", "defaultPrice": 120 },
+      { "name": "Gold Foil & Natural Pigments", "defaultPrice": 250 }
+    ]
+  }
+]
