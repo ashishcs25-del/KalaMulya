@@ -102,10 +102,73 @@ export default function NewProductStepper() {
   const [timeTakenText, setTimeTakenText] = useState<string>("20 hours of concentrated hand-stitching over two weeks");
   const [draftedStory, setDraftedStory] = useState<string>("");
   const [isDraftingStory, setIsDraftingStory] = useState<boolean>(false);
-  const [mainPhotoUrl, setMainPhotoUrl] = useState<string>(PRESET_PHOTOS.kasuti.main);
-  const [processPhotos, setProcessPhotos] = useState<string[]>(PRESET_PHOTOS.kasuti.process);
+  const [mainPhotoUrl, setMainPhotoUrl] = useState<string>("");
+  const [processPhotos, setProcessPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // Helper to resize/compress images client-side for smooth performance
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1200;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(e.target?.result as string);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.onerror = () => resolve(e.target?.result as string);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleMainPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const compressed = await compressImage(file);
+      if (compressed) {
+        setMainPhotoUrl(compressed);
+      }
+    }
+  };
+
+  const handleProcessPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      for (const file of Array.from(files)) {
+        const compressed = await compressImage(file);
+        if (compressed) {
+          setProcessPhotos((prev) => [...prev, compressed]);
+        }
+      }
+    }
+  };
+
+  const handleRemoveProcessPhoto = (index: number) => {
+    setProcessPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Load Artisans on mount
   useEffect(() => {
@@ -136,11 +199,6 @@ export default function NewProductStepper() {
           unitPriceInr: m.defaultPrice,
         }))
       );
-    }
-    const presets = PRESET_PHOTOS[newCraft as keyof typeof PRESET_PHOTOS];
-    if (presets) {
-      setMainPhotoUrl(presets.main);
-      setProcessPhotos(presets.process);
     }
   };
 
@@ -237,6 +295,10 @@ export default function NewProductStepper() {
   // Publish Product & Generate Passport
   const handlePublish = async () => {
     if (!priceResult) return;
+    if (!mainPhotoUrl || mainPhotoUrl.trim().length === 0) {
+      setErrorMessage("Please upload or provide a main photo for your craft before publishing.");
+      return;
+    }
     setIsSubmitting(true);
     setErrorMessage("");
 
@@ -309,10 +371,6 @@ export default function NewProductStepper() {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       {/* Page Title & Context */}
       <div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold mb-2">
-          <Scale className="w-3.5 h-3.5 text-amber-700" />
-          <span>Artisan Fair-Price Engine & Craft Passport Wizard</span>
-        </div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-stone-900">
           List Your Craft & Calculate Fair Price
         </h1>
@@ -1113,44 +1171,178 @@ export default function NewProductStepper() {
             />
           </div>
 
-          {/* Photos Showcase */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                Craft Photos (1 Finished Product + Process Photos)
+          {/* Photos Showcase & Custom Upload */}
+          <div className="space-y-4 pt-2">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-stone-700 block">
+                Craft Photos (Upload Your Pictures)
               </label>
-              <span className="text-[11px] text-stone-500">Preset demo photos loaded</span>
+              <span className="text-[11px] text-stone-500">
+                Upload your authentic photos directly from your device, or paste image URLs.
+              </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-amber-600 bg-stone-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={mainPhotoUrl}
-                  alt="Main Product"
-                  className="w-full h-full object-cover"
-                />
-                <span className="absolute bottom-1.5 left-1.5 bg-stone-900/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                  Main Photo
+            {/* Main Finished Product Photo */}
+            <div className="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-800">
+                  1. Finished Product Photo (Main Showcase) *
                 </span>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-sm">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>{mainPhotoUrl ? "Change Photo" : "Upload Picture"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleMainPhotoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {!mainPhotoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const preset = PRESET_PHOTOS[craftType as keyof typeof PRESET_PHOTOS];
+                        if (preset) setMainPhotoUrl(preset.main);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg border border-stone-300 text-stone-600 hover:bg-stone-200 text-xs font-medium transition"
+                    >
+                      Use Sample
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {processPhotos.map((url, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-square rounded-xl overflow-hidden border border-stone-300 bg-stone-100"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt={`Process ${i + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <span className="absolute bottom-1.5 left-1.5 bg-stone-900/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                    Process #{i + 1}
-                  </span>
+              {mainPhotoUrl ? (
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white p-3 rounded-xl border border-stone-200">
+                  <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-stone-200 bg-stone-100 shrink-0 shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={mainPhotoUrl}
+                      alt="Main Product Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-emerald-800 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        Photo loaded & ready
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setMainPhotoUrl("")}
+                        className="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Remove
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[11px] text-stone-500 block">Or edit image URL:</span>
+                      <input
+                        type="text"
+                        value={mainPhotoUrl.startsWith("data:") ? "(Uploaded local file)" : mainPhotoUrl}
+                        onChange={(e) => {
+                          if (!e.target.value.startsWith("(")) {
+                            setMainPhotoUrl(e.target.value);
+                          }
+                        }}
+                        placeholder="https://example.com/photo.jpg"
+                        className="w-full px-3 py-1.5 rounded-lg border border-stone-300 text-xs bg-stone-50"
+                      />
+                    </div>
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <label className="border-2 border-dashed border-stone-300 hover:border-amber-600 rounded-xl p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2 bg-white transition group">
+                  <div className="w-10 h-10 rounded-full bg-amber-50 group-hover:bg-amber-100 text-amber-700 flex items-center justify-center transition">
+                    <Upload className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-bold text-stone-800 group-hover:text-amber-800 transition">
+                    Click here to upload your product photo
+                  </span>
+                  <span className="text-[11px] text-stone-500">
+                    Supports PNG, JPG, JPEG, WebP from your device
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMainPhotoUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            {/* Process Photos Timeline */}
+            <div className="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-800">
+                  2. Making Process Photos (Optional craft timeline)
+                </span>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Upload Pictures</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleProcessPhotoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {processPhotos.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const preset = PRESET_PHOTOS[craftType as keyof typeof PRESET_PHOTOS];
+                        if (preset) setProcessPhotos(preset.process);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg border border-stone-300 text-stone-600 hover:bg-stone-200 text-xs font-medium transition"
+                    >
+                      Use Samples
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {processPhotos.length === 0 ? (
+                <div className="p-4 rounded-xl border border-dashed border-stone-300 text-center bg-white">
+                  <p className="text-xs text-stone-400 italic">
+                    No process photos added. You can upload photos showing the raw materials, tools, or stages of making.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {processPhotos.map((url, i) => (
+                    <div
+                      key={i}
+                      className="relative aspect-square rounded-xl overflow-hidden border border-stone-300 bg-stone-100 group shadow-sm"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt={`Process ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute bottom-1.5 left-1.5 bg-stone-900/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                        Step #{i + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveProcessPhoto(i)}
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center opacity-90 hover:opacity-100 transition shadow"
+                        title="Remove photo"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
