@@ -21,3 +21,24 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const deleted = await dbService.deleteProduct(params.id);
+    if (!deleted) {
+      return NextResponse.json(
+        { success: false, error: "Product not found or already removed" },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true, message: "Product removed successfully" });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || "Failed to remove product" },
+      { status: 500 }
+    );
+  }
+}

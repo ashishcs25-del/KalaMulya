@@ -134,6 +134,24 @@ export const dbService = {
     return newProduct;
   },
 
+  async deleteProduct(id: string) {
+    const client = getSupabaseServer();
+    if (client) {
+      const { error } = await client.from("products").delete().eq("id", id);
+      if (error) {
+        console.warn("Supabase delete product error, falling back to local DB:", error);
+      }
+    }
+    const db = getLocalDb();
+    const index = db.products.findIndex((p) => p.id === id);
+    if (index !== -1) {
+      db.products.splice(index, 1);
+      saveLocalDb(db);
+      return true;
+    }
+    return false;
+  },
+
   async createArtisan(artisanData: any) {
     const client = getSupabaseServer();
     if (client) {
