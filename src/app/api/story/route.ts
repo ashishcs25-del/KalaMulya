@@ -120,7 +120,9 @@ Write the final story in clear English:`;
       : `Each motif is shaped by hand with complete respect for sustainable, natural materials.`;
 
     const timeSentence = timeTaken
-      ? `Creating this piece requires ${timeTaken} of patience and concentration.`
+      ? timeTaken.toLowerCase().includes("patience") || timeTaken.toLowerCase().includes("over")
+        ? `Creating this piece requires ${timeTaken}.`
+        : `Creating this piece requires ${timeTaken} of patience and concentration.`
       : `Bringing this piece to life requires many hours of devoted handwork.`;
 
     const fallbackStory = `My name is ${artisanName} from ${village}. ${mentorSentence} ${detailSentence} ${timeSentence} When you bring this piece into your home, you support our craft legacy directly.`;

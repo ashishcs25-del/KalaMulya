@@ -41,27 +41,103 @@ interface ArtisanOption {
   craft: string;
 }
 
-const PRESET_PHOTOS = {
+const CRAFT_DEFAULTS: Record<
+  string,
+  {
+    productType: string;
+    productTitle: string;
+    hours: number;
+    skillLevel: "apprentice" | "skilled" | "master";
+    complexity: "simple" | "moderate" | "intricate";
+    giTagged: boolean;
+    materials: MaterialRow[];
+    mentor: string;
+    specialDetail: string;
+    timeTakenText: string;
+    story: string;
+    sampleMainPhoto: string;
+    sampleProcessPhotos: string[];
+  }
+> = {
+  kinhal: {
+    productType: "Idol / Figurine",
+    productTitle: "Handcrafted Kinhal Ganesha Figurine",
+    hours: 18,
+    skillLevel: "master",
+    complexity: "intricate",
+    giTagged: true,
+    materials: [
+      { name: "Seasoned Ponki Softwood Block", qty: 1, unitPriceInr: 450 },
+      { name: "Natural Tamarind-Seed Paste (Kitta) & Chalk", qty: 1, unitPriceInr: 120 },
+      { name: "Non-Toxic Pigments & Gold Foil", qty: 1, unitPriceInr: 280 },
+    ],
+    mentor: "My father, carrying forward our 4th-generation Chitragar lineage in Koppal",
+    specialDetail: "Hand-chiseled from seasoned Ponki softwood, sealed with traditional tamarind-seed paste (Kitta), and hand-painted with traditional iconography",
+    timeTakenText: "18 hours of detailed wood chiseling, natural paste layering, and fine brush embossing",
+    story: "My name is Anand Gudigar from Koppal, Karnataka. I learned the nuances of Kinhal Woodcraft from my father, carrying forward our 4th-generation Chitragar lineage. What makes this Handcrafted Kinhal Ganesha Figurine distinct is that it is hand-chiseled from seasoned Ponki softwood, sealed with traditional tamarind-seed paste (Kitta), and hand-painted with traditional iconography. Creating this piece requires 18 hours of detailed wood chiseling, natural paste layering, and fine brush embossing. When you bring this piece into your home, you support our craft legacy directly.",
+    sampleMainPhoto: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
+    sampleProcessPhotos: [
+      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
+    ],
+  },
   kasuti: {
-    main: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
-    process: [
+    productType: "Dupatta",
+    productTitle: "Heritage Kasuti Embroidered Dupatta",
+    hours: 20,
+    skillLevel: "skilled",
+    complexity: "intricate",
+    giTagged: true,
+    materials: [
+      { name: "Handloom Cotton Fabric (2.5m)", qty: 1, unitPriceInr: 250 },
+      { name: "Silk Floss & Needle Set", qty: 3, unitPriceInr: 50 },
+    ],
+    mentor: "My grandmother in our village home in Dharwad",
+    specialDetail: "Traditional Gopura and peacock motifs stitched thread-by-thread without tying knots",
+    timeTakenText: "20 hours of concentrated hand-stitching over two weeks",
+    story: "My name is Parvati Bai from Dharwad, Karnataka. I learned the nuances of Kasuti Embroidery from my grandmother, who instilled in me the discipline of handcrafted perfection. What makes this Heritage Kasuti Embroidered Dupatta distinct is traditional Gopura and peacock motifs stitched thread-by-thread without tying knots. Creating this piece requires 20 hours of concentrated hand-stitching over two weeks of patience and concentration. When you bring this piece into your home, you support our craft legacy directly.",
+    sampleMainPhoto: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
+    sampleProcessPhotos: [
       "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1528458876861-544fd1761a91?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
     ],
   },
   beedu: {
-    main: "https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=800&q=80",
-    process: [
+    productType: "Storage Basket",
+    productTitle: "Coastal Beedu Natural Reed Basket",
+    hours: 14,
+    skillLevel: "skilled",
+    complexity: "moderate",
+    giTagged: false,
+    materials: [
+      { name: "Wild River Grass / Reeds (bundle)", qty: 1, unitPriceInr: 180 },
+      { name: "Organic Turmeric & Bark Dyes", qty: 1, unitPriceInr: 90 },
+      { name: "Binding Thread & Jute Twine", qty: 1, unitPriceInr: 50 },
+    ],
+    mentor: "Our coastal weaving community elders in Udupi",
+    specialDetail: "Hand-harvested wild river reeds woven in breathable geometric patterns and dyed with natural turmeric",
+    timeTakenText: "14 hours of harvest preparation, reed splitting, and loom weaving",
+    story: "My name is Laxmi Poojary from Udupi, Karnataka. I learned the nuances of Beedu Craft from our coastal weaving community elders. What makes this Coastal Beedu Natural Reed Basket distinct is hand-harvested wild river reeds woven in breathable geometric patterns and dyed with natural turmeric. Creating this piece requires 14 hours of harvest preparation, reed splitting, and loom weaving. When you bring this piece into your home, you support our craft legacy directly.",
+    sampleMainPhoto: "https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=800&q=80",
+    sampleProcessPhotos: [
       "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=800&q=80",
     ],
   },
+};
+
+const PRESET_PHOTOS = {
   kinhal: {
-    main: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
-    process: [
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
-    ],
+    main: CRAFT_DEFAULTS.kinhal.sampleMainPhoto,
+    process: CRAFT_DEFAULTS.kinhal.sampleProcessPhotos,
+  },
+  kasuti: {
+    main: CRAFT_DEFAULTS.kasuti.sampleMainPhoto,
+    process: CRAFT_DEFAULTS.kasuti.sampleProcessPhotos,
+  },
+  beedu: {
+    main: CRAFT_DEFAULTS.beedu.sampleMainPhoto,
+    process: CRAFT_DEFAULTS.beedu.sampleProcessPhotos,
   },
 };
 
@@ -77,30 +153,27 @@ export default function NewProductStepper() {
   const [newArtisanName, setNewArtisanName] = useState<string>("");
   const [newArtisanVillage, setNewArtisanVillage] = useState<string>("");
 
-  // Step 1: Craft & Product Selection
-  const [craftType, setCraftType] = useState<string>("kasuti");
-  const [productType, setProductType] = useState<string>("Dupatta");
-  const [customProductTitle, setCustomProductTitle] = useState<string>("");
+  // Step 1: Craft & Product Selection (Defaults to Kinhal Woodcraft for the Ganesha Figurine)
+  const [craftType, setCraftType] = useState<string>("kinhal");
+  const [productType, setProductType] = useState<string>(CRAFT_DEFAULTS.kinhal.productType);
+  const [customProductTitle, setCustomProductTitle] = useState<string>(CRAFT_DEFAULTS.kinhal.productTitle);
 
   // Step 2: Cost & Labor Inputs
-  const [materials, setMaterials] = useState<MaterialRow[]>([
-    { name: "Handloom Cotton Fabric (2.5m)", qty: 1, unitPriceInr: 250 },
-    { name: "Silk Floss & Needle Set", qty: 3, unitPriceInr: 50 },
-  ]);
-  const [hoursSpent, setHoursSpent] = useState<number>(20);
-  const [skillLevel, setSkillLevel] = useState<"apprentice" | "skilled" | "master">("skilled");
-  const [giTagged, setGiTagged] = useState<boolean>(true);
-  const [complexity, setComplexity] = useState<"simple" | "moderate" | "intricate">("intricate");
+  const [materials, setMaterials] = useState<MaterialRow[]>(CRAFT_DEFAULTS.kinhal.materials);
+  const [hoursSpent, setHoursSpent] = useState<number>(CRAFT_DEFAULTS.kinhal.hours);
+  const [skillLevel, setSkillLevel] = useState<"apprentice" | "skilled" | "master">(CRAFT_DEFAULTS.kinhal.skillLevel);
+  const [giTagged, setGiTagged] = useState<boolean>(CRAFT_DEFAULTS.kinhal.giTagged);
+  const [complexity, setComplexity] = useState<"simple" | "moderate" | "intricate">(CRAFT_DEFAULTS.kinhal.complexity);
 
   // Step 3: Pricing Engine Output & Listed Price
   const [priceResult, setPriceResult] = useState<PricingResult | null>(null);
-  const [listedPrice, setListedPrice] = useState<number>(3690);
+  const [listedPrice, setListedPrice] = useState<number>(3350);
 
   // Step 4: Story & Photos
-  const [mentor, setMentor] = useState<string>("My grandmother");
-  const [specialDetail, setSpecialDetail] = useState<string>("Traditional Gopura and peacock motifs stitched without tying knots");
-  const [timeTakenText, setTimeTakenText] = useState<string>("20 hours of concentrated hand-stitching over two weeks");
-  const [draftedStory, setDraftedStory] = useState<string>("");
+  const [mentor, setMentor] = useState<string>(CRAFT_DEFAULTS.kinhal.mentor);
+  const [specialDetail, setSpecialDetail] = useState<string>(CRAFT_DEFAULTS.kinhal.specialDetail);
+  const [timeTakenText, setTimeTakenText] = useState<string>(CRAFT_DEFAULTS.kinhal.timeTakenText);
+  const [draftedStory, setDraftedStory] = useState<string>(CRAFT_DEFAULTS.kinhal.story);
   const [isDraftingStory, setIsDraftingStory] = useState<boolean>(false);
   const [mainPhotoUrl, setMainPhotoUrl] = useState<string>("");
   const [processPhotos, setProcessPhotos] = useState<string[]>([]);
@@ -177,28 +250,46 @@ export default function NewProductStepper() {
       .then((data) => {
         if (data.success && data.artisans.length > 0) {
           setArtisans(data.artisans);
-          setSelectedArtisanId(data.artisans[0].id);
+          // Default to Anand Gudigar (Kinhal Woodcraft artisan)
+          const kinhalArtisan = data.artisans.find(
+            (a: any) =>
+              a.craft.toLowerCase().includes("kinhal") ||
+              a.name.toLowerCase().includes("anand")
+          );
+          setSelectedArtisanId(kinhalArtisan ? kinhalArtisan.id : data.artisans[0].id);
         }
       })
       .catch(() => {});
   }, []);
 
   // Update craft defaults
-  const activeCraftConfig = craftsData.find((c) => c.id === craftType) || craftsData[0];
+  const activeCraftConfig = craftsData.find((c) => c.id === craftType) || craftsData[2];
 
   const handleCraftChange = (newCraft: string) => {
     setCraftType(newCraft);
-    const cfg = craftsData.find((c) => c.id === newCraft) || craftsData[0];
-    setProductType(cfg.productTypes[0]);
-    setGiTagged(cfg.giTagged);
-    if (cfg.commonMaterials && cfg.commonMaterials.length > 0) {
-      setMaterials(
-        cfg.commonMaterials.map((m) => ({
-          name: m.name,
-          qty: 1,
-          unitPriceInr: m.defaultPrice,
-        }))
-      );
+    const preset = CRAFT_DEFAULTS[newCraft] || CRAFT_DEFAULTS.kinhal;
+    setProductType(preset.productType);
+    setCustomProductTitle(preset.productTitle);
+    setGiTagged(preset.giTagged);
+    setMaterials(preset.materials);
+    setHoursSpent(preset.hours);
+    setSkillLevel(preset.skillLevel);
+    setComplexity(preset.complexity);
+    setMentor(preset.mentor);
+    setSpecialDetail(preset.specialDetail);
+    setTimeTakenText(preset.timeTakenText);
+    setDraftedStory(preset.story);
+
+    // Auto-match artisan
+    const matchingArtisan = artisans.find(
+      (a) =>
+        a.craft.toLowerCase().includes(newCraft.toLowerCase()) ||
+        (newCraft === "kinhal" && a.name.toLowerCase().includes("anand")) ||
+        (newCraft === "kasuti" && a.name.toLowerCase().includes("parvati")) ||
+        (newCraft === "beedu" && a.name.toLowerCase().includes("laxmi"))
+    );
+    if (matchingArtisan) {
+      setSelectedArtisanId(matchingArtisan.id);
     }
   };
 
@@ -1108,7 +1199,13 @@ export default function NewProductStepper() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. My grandmother in our village home in Dharwad"
+                placeholder={
+                  craftType === "kinhal"
+                    ? "e.g. My father, carrying forward our 4th-generation Chitragar lineage in Koppal"
+                    : craftType === "beedu"
+                    ? "e.g. Our coastal weaving community elders in Udupi"
+                    : "e.g. My grandmother in our village home in Dharwad"
+                }
                 value={mentor}
                 onChange={(e) => setMentor(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-white"
@@ -1121,7 +1218,13 @@ export default function NewProductStepper() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Pure handloom cotton with traditional Gopura and Mayura temple motifs"
+                placeholder={
+                  craftType === "kinhal"
+                    ? "e.g. Hand-carved from seasoned Ponki softwood, sealed with tamarind-seed paste (Kitta), and hand-painted"
+                    : craftType === "beedu"
+                    ? "e.g. Hand-harvested wild river reeds woven in breathable patterns and dyed with natural turmeric"
+                    : "e.g. Traditional Gopura and peacock motifs stitched without tying knots"
+                }
                 value={specialDetail}
                 onChange={(e) => setSpecialDetail(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-white"
@@ -1134,7 +1237,13 @@ export default function NewProductStepper() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Over 20 hours of delicate counting across 14 days"
+                placeholder={
+                  craftType === "kinhal"
+                    ? "e.g. 18 hours of detailed wood chiseling, natural paste layering, and fine brush embossing"
+                    : craftType === "beedu"
+                    ? "e.g. 14 hours of harvest preparation, reed splitting, and loom weaving"
+                    : "e.g. 20 hours of concentrated hand-stitching over two weeks"
+                }
                 value={timeTakenText}
                 onChange={(e) => setTimeTakenText(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-white"
