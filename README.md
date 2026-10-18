@@ -83,3 +83,4 @@ Refer to `package.json` for other available scripts.
 KalaMulya aims to make traditional craftsmanship more visible and economically sustainable by combining transparent pricing, digital product provenance, and accessible online discovery.
 
 **Preserving heritage. Supporting artisans. Building trust in every craft.**
+Deployment setup for KalaMulya.
