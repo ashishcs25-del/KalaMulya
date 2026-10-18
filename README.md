@@ -1,168 +1,85 @@
-# KalaMulya (ಕಲಾಮೌಲ್ಯ) — Fair-Price Engine & Craft Passport
+# KalaMulya
 
-> **DevHack 2026 (Sahyadri) — Round 1 Submission**  
-> **Problem Statement PS 4.2:** *Digital Market Access for Local Artisans* (Kasuti embroidery, Beedu craft, and coastal Karnataka heritage).
+**Fair Pricing and Digital Provenance for Karnataka's Heritage Artisans**
 
----
+KalaMulya is a digital platform designed to help traditional artisans present their handcrafted products, understand fair pricing, and preserve the cultural stories behind their craft.
 
-## 1. Executive Summary & Problem Context
-Traditional artisans producing **Kasuti embroidery** (Dharwad), **Beedu grass weaving** (Udupi & Coastal Karnataka), and **Kinhal lacquered woodcraft** (Koppal) face chronic economic marginalization:
-- **Zero Transparent Pricing**: Middlemen exploit artisans who lack structured tools to calculate true material and labor costs.
-- **Lost Cultural Provenance**: Factory machine-replicas undercut authentic handloom pieces because buyers cannot verify authenticity.
-- **High Digital Literacy Barrier**: Complex e-commerce dashboards exclude elderly and rural artisans.
+The platform connects artisan heritage with digital commerce through transparent pricing, digital Craft Passports, and a marketplace experience.
 
-**KalaMulya** solves this with an explainable fair-wage pricing engine, icon-led mobile workflows, and physical-to-digital **Craft Passports** with scannable QR codes.
+## Key Features
 
----
+### Explainable Fair Pricing
+Helps artisans estimate a fair selling price using factors such as materials, labour hours, skill, and craftsmanship.
 
-## 2. System Architecture
+### Digital Craft Passport
+Provides a digital record for a handcrafted product, including its craft story, materials, making process, and product details.
 
-```mermaid
-graph TD
-    subgraph Artisan Workflow
-        A[Artisan Wizard /artisan/new] -->|Guided Cost & Hours| B[Pricing Engine /lib/pricing.ts]
-        B -->|Living Wage Check| C[Price Recommendation & Breakdown]
-        C -->|3 Truthful Prompts| D[Story Drafter /api/story]
-        D -->|Publish Item| E[Supabase / Local Store]
-    end
+### Artisan Marketplace
+Showcases traditional handcrafted products and helps customers discover artisan-made goods.
 
-    subgraph Provenance & Physical Packaging
-        E --> F[Craft Passport /passport/id]
-        F -->|qrcode Package| G[Scannable & Printable QR Label]
-        G -.->|Attached to Parcel| H[Physical Craft Parcel]
-    end
+### Multilingual Experience
+Supports a more accessible experience for users through English and Kannada language options.
 
-    subgraph Conscious Buyer Experience
-        I[Buyer Storefront /] --> J[Product Details /products/id]
-        H -.->|Scan QR Code| F
-        J -->|Transparent Cost Breakdown| K[Simulated Checkout /checkout/id]
-        K -->|Mock Payment Confirmed| L[Order Created in DB]
-    end
+### Order Management
+Supports the order journey from purchase through order-status updates.
 
-    subgraph Fulfillment & Admin
-        L --> M[Artisan Orders Queue /orders]
-        M -->|Status: New -> Packed -> Shipped| N[Real-time Delivery Tracking]
-        O[Admin Panel /admin] -->|ADMIN_PASSWORD| P[1-Click Demo Reseed & Wiping]
-    end
-```
+## Technology Stack
 
----
+- **Frontend:** Next.js, React, TypeScript
+- **Styling:** Tailwind CSS
+- **Database and backend services:** Supabase integration, with local demo-data support where configured
+- **Testing:** Vitest
 
-## 3. How the Explainable Fair-Pricing Engine Works
-
-All numbers live in [`src/lib/pricingConfig.ts`](file:///g:/DEVHOST%20Hackaton/src/lib/pricingConfig.ts) and are pure, transparent rules:
-
-```typescript
-// Explicit Calibration Assumptions
-HOURLY_RATE_INR = { apprentice: 80, skilled: 120, master: 180 }
-OVERHEAD_PCT = 0.08            // 8% workshop overheads (tools, power, packaging)
-HERITAGE_PREMIUM = {
-  giTagged: 0.10,              // +10% for certified Geographical Indication
-  complexity: { simple: 0, moderate: 0.05, intricate: 0.12 }
-}
-ROUND_TO = 10                  // Clean retail rounding threshold in INR
-```
-
-### The Formula
-$$\text{materials} = \sum (\text{qty} \times \text{unitPriceInr})$$
-$$\text{labour} = \text{hoursSpent} \times \text{HOURLY\_RATE\_INR}[\text{skillLevel}]$$
-$$\text{overhead} = (\text{materials} + \text{labour}) \times 0.08$$
-$$\text{floor} = \text{materials} + \text{labour} + \text{overhead}$$
-$$\text{premium} = \text{floor} \times (\text{giPremium} + \text{complexityPremium})$$
-$$\text{target} = \text{floor} + \text{premium}$$
-
-### Hero Test Case (Verified in Vitest)
-For a **Kasuti Dupatta**:
-- Materials: ₹400
-- Hours: 20 hours (Skilled Artisan @ ₹120/hr) $\rightarrow$ ₹2,400 Labour
-- Overhead (8%): ₹224
-- Cost Floor: ₹3,024 (rounded: ₹3,020)
-- Heritage Premium: 10% (GI) + 12% (Intricate) = 22% of Floor $\rightarrow$ ₹665.28
-- **Target Fair Price: ₹3,689.28 $\rightarrow$ ₹3,690**
-
-### Living Wage Protection & Comparables
-- **Fair Wage Check**: $\text{Effective Wage} = \frac{\text{Target} - \text{Materials} - \text{Overhead}}{\text{Hours Spent}} \ge \text{Baseline Rate}$.
-- **Market Benchmarks**: Matches against regional dataset (`/data/comparables.json`). Computes p25, median, and p75. If fewer than 3 matches exist, falls back gracefully to broader craft data (`lowConfidence = true`).
-
----
-
-## 4. Key Screens & Deliverables
-
-| Screen | Route | Key Features |
-| :--- | :--- | :--- |
-| **Storefront** | `/` | Craft filter tabs, hero showcase banner, transparent price badges, and demo indicators. |
-| **Artisan Wizard** | `/artisan/new` | Large touch targets, materials row builder, hours slider, living wage verification, and story generation. |
-| **Product Page** | `/products/[id]` | High-res gallery, maker bio, *"Where your money goes"* animated breakdown bar. |
-| **Craft Passport** | `/passport/[id]` | Provenance certificate, dynamic QR code generation, PNG download, and printable layout. |
-| **Simulated Checkout** | `/checkout/[id]` | Buyer details, simulated payment, confetti celebration, and order confirmation. |
-| **Artisan Orders** | `/orders` | Order management dashboard with status toggles (`New` $\rightarrow$ `Packed` $\rightarrow$ `Shipped`). |
-| **Admin Console** | `/admin` | Protected by `ADMIN_PASSWORD`, product/artisan management, and 1-click database reset. |
-
----
-
-## 5. Alignment with DevHack 2026 Judging Rubric
-
-| Judging Criteria | Implementation in KalaMulya |
-| :--- | :--- |
-| **1. Innovation & Originality** | Replaces opaque marketplace algorithms with transparent *"Where your money goes"* cost bars and physical-to-digital Craft Passports with printable QR codes. |
-| **2. Technical Feasibility** | Clean Next.js 14 App Router, pure deterministic TypeScript pricing engine with 100% Vitest test coverage, and resilient Supabase integration with offline fallback. |
-| **3. Impact & Inclusivity** | Designed specifically for low digital literacy: large icons, minimal text, living wage protection, and a **Bilingual Kannada/English switcher**. |
-| **4. Clarity of Submission** | Clean git history, zero secrets committed, full mock datasets, and 1-click reset before video recording. |
-| **5. Business & Monetization** | Disintermediates exploitative middlemen, allowing artisans to capture an estimated 35-50% higher net earnings with zero commission leakage. |
-
----
-
-## 6. Setup & Running Locally
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+ (tested on Node v24.19 / npm v12)
 
-### Quick Start
-```powershell
-# 1. Clone repository and navigate
-cd "DEVHOST Hackaton"
+- Node.js and npm
+- Git
 
-# 2. Install dependencies
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ashishcs25-del/KalaMulya.git
+cd KalaMulya
+```
+
+Install dependencies:
+
+```bash
 npm install
+```
 
-# 3. Setup environment variables (pre-configured with local fallbacks)
-cp .env.example .env.local
+### Environment Configuration
 
-# 4. Run automated unit tests
-npm test
+If you use Supabase or optional AI features, configure the required environment variables in a local `.env.local` file according to `.env.example` and the application's configuration.
 
-# 5. Populate or reset demo database
-npm run reset
+Never commit `.env.local`, API keys, passwords, or other secrets to version control.
 
-# 6. Start development server
+### Run Locally
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Visit **[http://localhost:3000](http://localhost:3000)** in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
----
+Refer to `package.json` for other available scripts.
 
-## 7. Environment Variables (`.env.local`)
+## Project Structure
 
-```env
-# Supabase Configuration (Optional: App falls back to local JSON store if empty)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+- `src/` — application source code
+- `data/` — local data and demo-data support
+- `supabase/` — Supabase-related configuration or resources
+- `scripts/` — utility scripts
+- `tests/` — automated tests
 
-# Admin Dashboard Access
-ADMIN_PASSWORD=kalamulya2026
+## Project Vision
 
-# Optional: LLM Story Drafting (Falls back to deterministic template if empty)
-GEMINI_API_KEY=
-ANTHROPIC_API_KEY=
-```
+KalaMulya aims to make traditional craftsmanship more visible and economically sustainable by combining transparent pricing, digital product provenance, and accessible online discovery.
 
----
-
-## 8. Demo Recording Guide (For Hackathon Video)
-1. Navigate to `/admin`, enter password `kalamulya2026`, and click **"Reset & Reseed Demo Data"**.
-2. Visit `/` to showcase the **Kasuti Dupatta hero product** and toggle between English and Kannada.
-3. Open `/artisan/new` and demonstrate the 4-step wizard calculating the **₹3,690** fair target.
-4. Open `/passport/p1111111-1111-4111-b111-111111111111` to show the generated QR code and process timeline.
-5. Complete a simulated checkout at `/checkout/...` and switch status to **Packed** in `/orders`.
+**Preserving heritage. Supporting artisans. Building trust in every craft.**
